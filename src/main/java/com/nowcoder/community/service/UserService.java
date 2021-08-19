@@ -35,7 +35,7 @@ public class UserService implements CommunityConstant {
     @Autowired
     private UserMapper userMapper;
 
-    public User findUserById(int id){
+    public User findUserById(int id) {
         return userMapper.selectById(id);
     }
 
@@ -82,19 +82,19 @@ public class UserService implements CommunityConstant {
         userMapper.insertUser(user);
 
         //激活邮件
-        Context context=new Context();
-        context.setVariable("email",user.getEmail());
+        Context context = new Context();
+        context.setVariable("email", user.getEmail());
         // http://localhost:8080/community/activation/101/code
-        String url=domain+contextPath+"/activation/"+user.getId()+"/"+user.getActivationCode();
-        context.setVariable("url",url);
-        String content=templateEngine.process("mail/activation",context);
-        mailClient.senMail(user.getEmail(),"激活账号",content);
+        String url = domain + contextPath + "/activation/" + user.getId() + "/" + user.getActivationCode();
+        context.setVariable("url", url);
+        String content = templateEngine.process("mail/activation", context);
+        mailClient.senMail(user.getEmail(), "激活账号", content);
         return map;
     }
 
     //激活账号
-    public int activation(int userId,String code){
-        User user=userMapper.selectById(userId);
+    public int activation(int userId, String code) {
+        User user = userMapper.selectById(userId);
         //如果已经激活
         if (user.getStatus() == 1) {
             return ACTIVATION_REPEAT;
@@ -107,72 +107,5 @@ public class UserService implements CommunityConstant {
         }
     }
 
-//
-//    //登录
-//    public Map<String, Object> login(String username, String password, int expiredSeconds) {
-//        Map<String, Object> map = new HashMap<>();
-//
-//        //空值处理
-//        if (StringUtils.isBlank(username)) {
-//            map.put("usernameMsg", "账号不能为空");
-//            return map;
-//        }
-//        if (StringUtils.isBlank(password)) {
-//            map.put("passwordMsg", "密码不能为空");
-//            return map;
-//        }
-//
-//        //验证账号
-//        User user = userMapper.selectByName(username);
-//        if ((user == null)) {
-//            map.put("usernameMsg", "该账号不存在！");
-//            return map;
-//        }
-//
-//        //账号状态
-//        if (user.getStatus() == 0) {
-//            map.put("usernameMsg", "账号未激活");
-//            return map;
-//        }
-//
-//        //验证密码
-//        password = CommunityUtil.md5(password + user.getSalt());
-//        if (!user.getPassword().equals(password)) {
-//            map.put("passwordMsg", "密码不正确");
-//            return map;
-//        }
-//
-//        //生成登录凭证
-//        LoginTicket loginTicket = new LoginTicket();
-//        loginTicket.setUserId(user.getId());
-//        loginTicket.setTicket(CommunityUtil.generateUUID());
-//        loginTicket.setStatus(0);
-//        loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
-//        loginTicketMapper.insertLoginTicket(loginTicket);
-//
-//        map.put("ticket", loginTicket.getTicket());
-//
-//
-//        return map;
-//    }
-//
-//    //退出
-//    public void logout(String ticket) {
-//        loginTicketMapper.updateStatus(ticket, 1);
-//    }
-//
-//
-//    // 查询凭证
-//    public LoginTicket findLoginTicket(String ticket) {
-//        return loginTicketMapper.selectByTicket(ticket);
-//    }
-//
-//    //修改头像路径
-//    public int updateHeader(int userId, String headerUrl) {
-//        return userMapper.updateHeader(userId, headerUrl);
-//    }
-//
-//    public User findUserByName(String username) {
-//        return userMapper.selectByName(username);
-//    }
+
 }
