@@ -52,10 +52,11 @@ public class LoginService {
         LoginTicket loginTicket = new LoginTicket();
         loginTicket.setUserId(user.getId());
         loginTicket.setTicket(CommunityUtil.generateUUID());
-        loginTicket.setStatus(user.getStatus());
+        //状态0代表登录凭证有效
+        loginTicket.setStatus(0);
         loginTicket.setExpired(new Date(System.currentTimeMillis()+expiredSeconds*1000));
         loginTicketMapper.insertLoginTicket(loginTicket);
-        map.put("loginTicket",loginTicket.getTicket());
+        map.put("ticket",loginTicket.getTicket());
         return map;
     }
 
