@@ -5,8 +5,10 @@ import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.util.CommunityUtil;
+import com.nowcoder.community.util.RedisKeyUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,11 +17,14 @@ import java.util.Map;
 
 @Service
 public class LoginService {
-    @Autowired
-    LoginTicketMapper loginTicketMapper;
+//    @Autowired
+//    LoginTicketMapper loginTicketMapper;
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     public Map<String,Object> login(String username, String password, int expiredSeconds){
         Map<String,Object> map = new HashMap<>();
@@ -55,7 +60,10 @@ public class LoginService {
         //状态0代表登录凭证有效
         loginTicket.setStatus(0);
         loginTicket.setExpired(new Date(System.currentTimeMillis()+expiredSeconds*1000));
-        loginTicketMapper.insertLoginTicket(loginTicket);
+//        loginTicketMapper.insertLoginTicket(loginTicket);
+        //将ticket存入redis中
+        String redisKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
+        redisTemplate.opsForValue().set(redisKey, loginTicket);
         map.put("ticket",loginTicket.getTicket());
         return map;
     }
@@ -66,6 +74,10 @@ public class LoginService {
             return;
         }
         //1表示无效
-        loginTicketMapper.updateStatus(ticket,1);
+//        loginTicketMapper.updateStatus(ticket,1);
+        String redisKey = RedisKeyUtil.getTicketKey(ticket);
+        LoginTicket loginTicket = (LoginTicket) redisTemplate.opsForValue().get(redisKey);
+        loginTicket.setStatus(1);
+        redisTemplate.opsForValue().set(redisKey, loginTicket);
     }
 }

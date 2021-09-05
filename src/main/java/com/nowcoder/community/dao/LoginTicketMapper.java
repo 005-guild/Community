@@ -4,6 +4,7 @@ import com.nowcoder.community.entity.LoginTicket;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+@Deprecated
 @Mapper
 //弃用，因为重构代码将用户登录信息存到redis中，为了提高效率
 public interface LoginTicketMapper {
